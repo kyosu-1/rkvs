@@ -22,6 +22,8 @@ services:
       - HTTP_ADDR=:8080
     depends_on:
       - raft1
+    ports:
+      - "8082:8080"
     networks:
       raftnet:
         ipv4_address: 172.28.0.12
@@ -35,6 +37,8 @@ services:
       - HTTP_ADDR=:8080
     depends_on:
       - raft1
+    ports:
+      - "8083:8080"
     networks:
       raftnet:
         ipv4_address: 172.28.0.13
@@ -48,6 +52,8 @@ services:
       - HTTP_ADDR=:8080
     depends_on:
       - raft1
+    ports:
+      - "8084:8080"
     networks:
       raftnet:
         ipv4_address: 172.28.0.14
@@ -61,6 +67,8 @@ services:
       - HTTP_ADDR=:8080
     depends_on:
       - raft1
+    ports:
+      - "8085:8080"
     networks:
       raftnet:
         ipv4_address: 172.28.0.15
