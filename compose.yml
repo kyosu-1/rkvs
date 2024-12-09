@@ -1,14 +1,13 @@
-version: "3.9"
 services:
   raft1:
     build: .
     environment:
       - NODE_ID=node1
-      - RAFT_ADDR=172.28.0.11:7000
+      - RAFT_ADDR=raft1:7000
       - BOOTSTRAP=true
       - HTTP_ADDR=:8080
+    # 外部から直接アクセスしたい場合はポートマッピング
     ports:
-      - "7001:7000"
       - "8081:8080"
     networks:
       raftnet:
@@ -18,47 +17,37 @@ services:
     build: .
     environment:
       - NODE_ID=node2
-      - RAFT_ADDR=172.28.0.12:7000
-      # リーダーは172.28.0.11:8080でHTTP待受している
-      - JOIN_ADDR=http://172.28.0.11:8080
+      - RAFT_ADDR=raft2:7000
+      - JOIN_ADDR=http://raft1:8080
       - HTTP_ADDR=:8080
     depends_on:
       - raft1
-    ports:
-      - "7002:7000"
-      - "8082:8080"
     networks:
       raftnet:
         ipv4_address: 172.28.0.12
-  
+
   raft3:
     build: .
     environment:
       - NODE_ID=node3
-      - RAFT_ADDR=172.28.0.13:7000
-      - JOIN_ADDR=http://172.28.0.11:8080
+      - RAFT_ADDR=raft3:7000
+      - JOIN_ADDR=http://raft1:8080
       - HTTP_ADDR=:8080
     depends_on:
       - raft1
-    ports:
-      - "7003:7000"
-      - "8083:8080"
     networks:
       raftnet:
         ipv4_address: 172.28.0.13
-  
+
   raft4:
     build: .
     environment:
       - NODE_ID=node4
-      - RAFT_ADDR=172.28.0.14:7000
-      - JOIN_ADDR=http://172.28.0.11:8080
+      - RAFT_ADDR=raft4:7000
+      - JOIN_ADDR=http://raft1:8080
       - HTTP_ADDR=:8080
     depends_on:
       - raft1
-    ports:
-      - "7004:7000"
-      - "8084:8080"
     networks:
       raftnet:
         ipv4_address: 172.28.0.14
@@ -67,14 +56,11 @@ services:
     build: .
     environment:
       - NODE_ID=node5
-      - RAFT_ADDR=172.28.0.15:7000
-      - JOIN_ADDR=http://172.28.0.11:8080
+      - RAFT_ADDR=raft5:7000
+      - JOIN_ADDR=http://raft1:8080
       - HTTP_ADDR=:8080
     depends_on:
       - raft1
-    ports:
-      - "7005:7000"
-      - "8085:8080"
     networks:
       raftnet:
         ipv4_address: 172.28.0.15
