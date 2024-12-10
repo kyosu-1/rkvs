@@ -208,6 +208,12 @@ func handleRemove(r *raft.Raft) http.HandlerFunc {
 	}
 }
 
+func handleHealthCheck(r *raft.Raft) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		w.Write([]byte("ok"))
+	}
+}
+
 func newHTTPRouter(r *raft.Raft, fsm *fsm) http.Handler {
 	rtr := mux.NewRouter()
 	rtr.HandleFunc("/join", handleJoin(r)).Methods("GET")
@@ -217,6 +223,7 @@ func newHTTPRouter(r *raft.Raft, fsm *fsm) http.Handler {
 	rtr.HandleFunc("/peers", handlePeers(r)).Methods("GET")
 	rtr.HandleFunc("/stats", handleStats(r)).Methods("GET")
 	rtr.HandleFunc("/remove", handleRemove(r)).Methods("GET")
+	rtr.HandleFunc("/health", handleHealthCheck(r)).Methods("GET")
 	return rtr
 }
 
