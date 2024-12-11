@@ -45,6 +45,12 @@ func (f *fsm) Apply(l *raft.Log) interface{} {
 			f.kvs[key] = val
 			return val
 		}
+	case "delete":
+		if len(parts) == 2 {
+			key := parts[1]
+			delete(f.kvs, key)
+			return key
+		}
 	}
 	return nil
 }
@@ -214,6 +220,24 @@ func handleHealthCheck(r *raft.Raft) http.HandlerFunc {
 	}
 }
 
+func handleDelete(r *raft.Raft) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		q := req.URL.Query()
+		key := q.Get("key")
+		if key == "" {
+			http.Error(w, "key required", http.StatusBadRequest)
+			return
+		}
+		cmd := fmt.Sprintf("delete %s", key)
+		f := r.Apply([]byte(cmd), 5*time.Second)
+		if f.Error() != nil {
+			http.Error(w, f.Error().Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write([]byte("deleted"))
+	}
+}
+
 func newHTTPRouter(r *raft.Raft, fsm *fsm) http.Handler {
 	rtr := mux.NewRouter()
 	rtr.HandleFunc("/join", handleJoin(r)).Methods("GET")
@@ -224,6 +248,7 @@ func newHTTPRouter(r *raft.Raft, fsm *fsm) http.Handler {
 	rtr.HandleFunc("/stats", handleStats(r)).Methods("GET")
 	rtr.HandleFunc("/remove", handleRemove(r)).Methods("GET")
 	rtr.HandleFunc("/health", handleHealthCheck(r)).Methods("GET")
+	rtr.HandleFunc("/delete", handleDelete(r)).Methods("GET")
 	return rtr
 }
 
